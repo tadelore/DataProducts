@@ -1,0 +1,51 @@
+---
+title: "Coursera_Peer_ Graded _Assignment"
+author: "Temilade Sorungbe"
+date: "26 October 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+mapfile <- file.path("C:/Users/datacent52/Documents/TemiladeAdelore_Office/DataScienceCourse/DevelopingDataProducts/Leaflet")
+setwd(mapfile)
+library(xlsx)
+Data1 <- read.xlsx("Mapdata.xlsx", sheetIndex = 1)
+Data2 <- read.xlsx("Mapdata.xlsx", sheetIndex = 2)
+```
+
+#Upload Map of Nigeria
+```{r, eval=FALSE}
+library(leaflet)
+library(rgdal)
+library(dplyr)
+
+#Upload shape file of Nigerian states 
+states2 = readOGR(dsn = "Nigeria2", layer="NGA_adm1") 
+
+#color code the states by number of patients in Digital Image Library database
+pal <- colorNumeric("Blues", Data2$Number.of.Patients.in.DIL.database)
+
+
+#create map icons for health facilities by type 
+#blue for primary, red for secondary and green for tertiary health facilities
+
+blue_URL <- " http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|abcdef&chf=a,s,ee00FFFF"
+red_URL <- "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|e85141&chf=a,s,ee00FFFF"
+green_URL <- "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|e85141&chf=a,s,ee00FFFF"
+
+mapIcons <- iconList(blue =  makeIcon(blue_URL, iconWidth = 24, iconHeight =32),
+                       red = makeIcon(red_URL, iconWidth = 24, iconHeight =32),
+                       green= makeIcon(green_URL, iconWidth = 24, iconHeight =32))
+
+#create map
+states2 %>% leaflet() %>% addTiles() %>%
+        setView(lat = 9.081999, lng = 8.675277, zoom = 5) %>% #zoom into Nigeria #
+               addPolygons(stroke = FALSE, fillOpacity = 0.6, smoothFactor = 0.5,
+                    color = ~pal(Data2$Number.of.Patients.in.DIL.database)) %>%
+        addLegend("topright", pal = pal, values = ~Data2$Number.of.Patients.in.DIL.database,
+                  title = "Number of PEPFAR patients, 2004-2010 (Created: 11/11/2016)",
+                opacity = 1) %>%
+        addMarkers(lng=~Data1$lng, lat=~Data1$lat, popup=~as.character(Data1$FACILITY.NAME), 
+                   clusterOptions = markerClusterOptions()) #%>%
+```
