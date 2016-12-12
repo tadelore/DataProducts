@@ -15,13 +15,17 @@ fluidPage(
   sidebarLayout(
     sidebarPanel(
       
+      helpText("This Shiny App performs 3 types of exploratory analyses on", 
+                "the cars dataset. The user should select one of the",
+                "3 types of exploratory analyses below and",
+                "click on 'Update View' to view results:"),
+      
       selectInput("analysis", 
-                  label = "Choose a type of exploratory analysis:", 
+                  label = "Select a type of exploratory analysis:", 
                   choices = c("Histogram", "Boxplot", "Data Summary"),
                   selected = "Histogram"),
     
     submitButton("Update View")
-    
     ),
   
   
